@@ -10,7 +10,7 @@ pipeline{
             }
         }
         stage("Testing paralel jobs"){
-            failFast false
+            failFast true
             parallel {
                 stage("First command"){
                     steps {
