@@ -18,7 +18,7 @@ pipeline{
                 }
                 stage("Second command"){
                     steps {
-                    sh "cat test.txt"
+                    sh "cat test12312323.txt"
                     }
                 }
                 stage("Third command"){
