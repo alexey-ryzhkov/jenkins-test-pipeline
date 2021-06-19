@@ -12,13 +12,19 @@ pipeline{
         stage("Testing paralel jobs"){
             parallel {
                 stage("First command"){
+                    steps {
                     sh "echo test > test.txt"
+                    }
                 }
                 stage("Second command"){
+                    steps {
                     sh "cat test.txt"
+                    }
                 }
                 stage("Third command"){
+                    steps {
                     sh "date"
+                    }
                 }
             }
         }
