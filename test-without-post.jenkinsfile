@@ -5,7 +5,7 @@ pipeline{
     stages{
         stage("Checking hostname"){
             steps{
-                echo hostname
+                sh "hostname"
             }
         }
     }
