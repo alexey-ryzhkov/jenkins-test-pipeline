@@ -1,10 +1,23 @@
 pipeline{
     agent{
-        label "master"
+        label "any"
     }
     stages{
-        stage("Checking hostname"){
+        stage("Checking hostname on master"){
+            agent {
+                label "master"
+            }
             steps{
+                sh "hostname"
+            }
+        }
+    }
+    stages{
+        stage("Checking hostname on node"){
+            agent {
+                label "linux"
+            }
+            steps {
                 sh "hostname"
             }
         }
