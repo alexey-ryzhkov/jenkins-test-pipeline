@@ -11,8 +11,6 @@ pipeline{
                 sh "hostname"
             }
         }
-    }
-    stages{
         stage("Checking hostname on node"){
             agent {
                 label "linux"
