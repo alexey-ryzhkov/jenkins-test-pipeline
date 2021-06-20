@@ -45,7 +45,7 @@ pipeline{
                                 testlib.unit_function "${params.UNIT_TESTS}"
                             }
                         
-                            testlib.variable_check "${test_env}"
+                            testlib.variable_check "${test_env_copy}"
                         
                         
                         }
