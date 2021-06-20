@@ -15,7 +15,7 @@ pipeline{
                 stage("First command"){
                     steps {
                     sh "echo test > test.txt"
-                    sh "sleep 20"
+                    sh "sleep 5"
                     }
                 }
                 stage("Second command"){
@@ -28,7 +28,7 @@ pipeline{
                 stage("Third command"){
                     steps {
                     sh "date"
-                    sh "sleep 20"
+                    sh "sleep 5"
                     }
                 }
             }
