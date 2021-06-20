@@ -10,7 +10,7 @@ pipeline{
             }
         }
         stage("Testing paralel jobs"){
-            failFast true
+            failFast false
             parallel {
                 stage("First command"){
                     steps {
@@ -20,7 +20,9 @@ pipeline{
                 }
                 stage("Second command"){
                     steps {
-                    sh "cat test12312323.txt"
+                        catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE'){
+                        sh "cat test12312323.txt"
+                        }
                     }
                 }
                 stage("Third command"){
