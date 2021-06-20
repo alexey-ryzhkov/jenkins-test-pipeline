@@ -36,9 +36,9 @@ pipeline{
                             testlib.unit_function "${params.UNIT_TESTS}"
                         }
 
-#                        catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
-#                        sh "cat test12312323.txt"
-#                        }
+//                       catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
+//                        sh "cat test12312323.txt"
+//                        }
                     }
                 }
                 stage("Third command"){
