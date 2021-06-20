@@ -33,7 +33,9 @@ pipeline{
 
                     steps {
                         script {
-                            testlib.unit_function "${params.UNIT_TESTS}"
+                            catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
+                                testlib.unit_function "${params.UNIT_TESTS}"
+                            }
                         }
 
 //                       catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
