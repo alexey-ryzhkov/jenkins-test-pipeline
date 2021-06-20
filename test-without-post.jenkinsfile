@@ -1,5 +1,15 @@
+@Library('test-library@main') _
 pipeline{
     agent any
+    parameters {
+
+        choice(
+            choices: ['on' , 'off'],
+            description: '',
+            name: 'UNIT_TESTS'
+        )
+    }            
+
     stages{
         stage("Checking hostname on master"){
             agent {
@@ -19,10 +29,16 @@ pipeline{
                     }
                 }
                 stage("Second command"){
+                    
+
                     steps {
-                        catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
-                        sh "cat test12312323.txt"
+                        script {
+                            test-library.unit_function params.UNIT_TESTS
                         }
+
+#                        catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
+#                        sh "cat test12312323.txt"
+#                        }
                     }
                 }
                 stage("Third command"){
