@@ -1,4 +1,4 @@
-@Library('test-library@v1.2') _
+@Library('test-library@v1.3') _
 pipeline{
     agent any
     parameters {
@@ -9,6 +9,14 @@ pipeline{
             name: 'UNIT_TESTS'
         )
     }            
+    
+    environment {
+    
+    test_env = "1"
+    test_env_copy = "5"
+    
+    }
+
 
     stages{
         stage("Checking hostname on master"){
@@ -36,6 +44,10 @@ pipeline{
                             catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
                                 testlib.unit_function "${params.UNIT_TESTS}"
                             }
+                        
+                            testlib.variable_check "${test_env}"
+                        
+                        
                         }
 
 //                       catchError(buildResult: 'Unstable', stageResult: 'FAILURE'){
