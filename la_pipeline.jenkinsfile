@@ -1,5 +1,8 @@
 pipeline{
     agent any
+    environment {
+        gccHome = "/usr/bin/gcc"
+    }
     stages{
         stage("Gettig git repo data"){
             steps{
@@ -8,7 +11,7 @@ pipeline{
         }
         stage("Building App"){
             steps {
-                sh "gcc --std=c99 -o mario lab1_lab2/mario.c"
+                sh "$gccHome --std=c99 -o mario lab1_lab2/mario.c"
             }
         }
         stage("Archiving artifacts"){
