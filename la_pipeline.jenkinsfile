@@ -11,7 +11,7 @@ pipeline{
         }
         stage("Building App"){
             steps {
-                sh "$gccHome --std=c99 -o mario lab1_lab2/mario.c"
+                sh "'${gccHome}' --std=c99 -o mario lab1_lab2/mario.c"
             }
         }
         stage("Archiving artifacts"){
