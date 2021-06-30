@@ -1,0 +1,25 @@
+pipeline{
+    agent {
+        docker { 
+            image 'linuxacademycontent/jenkins_pipelines'
+            label 'srv1'
+            }
+    }
+    stages{
+        stage("Gettig git repo data"){
+            steps{
+                git 'https://github.com/linuxacademy/content-pipelines-cje-labs.git'
+            }
+        }
+        stage("Building App"){
+            steps {
+                sh "gcc --std=c99 -o mario content-pipelines-cje-labs/lab1_lab2/mario.c"
+            }
+        }
+        stage("Archiving artifacts"){
+            steps {
+                archiveArtifacts artifacts: 'mario', followSymlinks: false
+            }
+        }
+    }
+}
