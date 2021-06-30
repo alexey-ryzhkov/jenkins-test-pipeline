@@ -1,0 +1,54 @@
+pipeline {
+    agent any
+    parameters {
+    //string(name: 'custom_version', defaultValue: "${env.BUILD_NUMBER}", description: 'Build version')
+    string(name: 'custom_version', defaultValue: 'none', description: 'Enter custom build version')
+    }          
+    
+    //environment {
+    
+    //version = "${env.BUILD_NUMBER}"
+    /*version = "${manual_version}"
+    srv1_var = "1"
+    srv2_var = "2"
+    version_test = "${manual_version}"*/    
+    //}
+
+
+    stages{
+
+        stage('Assign variables') {
+            steps {
+                script {
+                    if (custom_version != 'none') {
+                        env.version = "${custom_version}"
+                    }
+                    else {
+                        env.version = "${env.BUILD_NUMBER}"
+                    }
+                }
+                sh "echo $version"
+            }
+        }
+        
+        stage("Stage A"){
+            agent {
+                label "srv1"
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                //sh "echo $version_test"
+            }
+        }
+        stage("Stage B"){
+            agent {
+                label "srv2"
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+            }
+        } 
+    }
+}
