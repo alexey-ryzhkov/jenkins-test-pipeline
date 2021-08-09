@@ -1,0 +1,289 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'custom_version', defaultValue: 'none', description: 'Leave this as none to follow the default version naming or put the custom version')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_FRONTEND')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_BACKEND')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_ADMIN')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_INFR')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_DB')
+    }          
+    
+    stages{
+
+        stage('Assign variables') {
+            steps {
+                script {
+                    if (custom_version != 'none') {
+                        env.version = "${custom_version}"
+                    }
+                    else {
+                        env.version = "${env.BUILD_NUMBER}"
+                    }
+                }
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+        stage("Prebuild Stage"){
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+
+        }
+
+        stage("Stage A"){
+            agent {
+                label "srv1"
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+
+        stage("Stage B"){
+            agent {
+                label "srv1"
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+
+        stage("Build Images"){
+            parallel{
+                stage("Build Coach Image Part 1") {
+                    when {
+                        environment name: 'BUILD_BACKEND', value: 'on'
+                        beforeAgent true
+                    }
+                    steps{
+                    sh "echo 'Backend stage' > backend-${version}.txt"
+                    sh "hostname"
+                    sh "echo $version"
+                    sh "echo $BUILD_FRONTEND"
+                    sh "echo $BUILD_BACKEND"
+                    sh "echo $BUILD_ADMIN"
+                    sh "echo $BUILD_INFR"
+                    sh "echo $BUILD_DB"
+                    stash includes: '*.txt', name: 'appfiles'
+                    }
+                    
+                }
+                stage("Build Coach Image Part 2") {
+                    when {
+                        environment name: 'BUILD_FRONTEND', value: 'on'
+                        beforeAgent true
+                    }
+                    steps{
+                    sh "echo 'Frontend stage' > frontend-${version}.txt"
+                    sh "hostname"
+                    sh "echo $version"
+                    sh "echo $BUILD_FRONTEND"
+                    sh "echo $BUILD_BACKEND"
+                    sh "echo $BUILD_ADMIN"
+                    sh "echo $BUILD_INFR"
+                    sh "echo $BUILD_DB"
+                    }
+                }
+                stage("Build Admin Image") {
+                    when {
+                        environment name: 'BUILD_ADMIN', value: 'on'
+                        beforeAgent true
+                    }
+                    steps{
+                    sh 'echo "Admin stage" > admin.txt'
+                    sh "hostname"
+                    sh "echo $version"
+                    sh "echo $BUILD_FRONTEND"
+                    sh "echo $BUILD_BACKEND"
+                    sh "echo $BUILD_ADMIN"
+                    sh "echo $BUILD_INFR"
+                    sh "echo $BUILD_DB"
+                    }
+                }
+                stage("Build DB") {
+                    when {
+                        environment name: 'BUILD_DB', value: 'on'
+                        beforeAgent true
+                    }
+                    steps{
+                    sh "hostname"
+                    sh "echo $version"
+                    sh "echo $BUILD_FRONTEND"
+                    sh "echo $BUILD_BACKEND"
+                    sh "echo $BUILD_ADMIN"
+                    sh "echo $BUILD_INFR"
+                    sh "echo $BUILD_DB"
+                    }
+                }
+                //stage("Execute Xamarin Test") {
+                //    when {
+                //        environment name: 'BUILD_INFR', value: 'off'
+                //        beforeAgent true
+                //    }
+                //    steps{
+                //    sh "hostname"
+                //    sh "echo $version"
+                //    sh "echo $BUILD_FRONTEND"
+                //    sh "echo $BUILD_BACKEND"
+                //    sh "echo $BUILD_ADMIN"
+                //    sh "echo $BUILD_INFR"
+                //    sh "echo $BUILD_DB"
+                //    }
+                //}
+            }
+
+        }
+        stage("Finish Coach Image Build"){
+            when {
+                anyOf {
+                    environment name: 'BUILD_FRONTEND', value: 'on'
+                    environment name: 'BUILD_BACKEND', value: 'on'
+                }
+                beforeAgent true
+            }
+            steps{
+                script {
+                    if ("${BUILD_BACKEND}" == 'off') {
+                        sh "echo BACKEND build was disabled"
+                    }
+
+                    if ("${BUILD_FRONTEND}" == 'off') {
+                        sh "echo FRONTEND build was disabled"
+                    }
+                }
+                unstash 'appfiles'
+                sh "cat backend-${version}.txt"
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+        stage("Push Images"){
+            when {
+                anyOf {
+                    environment name: 'BUILD_FRONTEND', value: 'on'
+                    environment name: 'BUILD_BACKEND', value: 'on'
+                    environment name: 'BUILD_ADMIN', value: 'on'
+                }
+                beforeAgent true
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+        stage("Destroy old DB"){
+            when {
+                environment name: 'BUILD_DB', value: 'on'
+                beforeAgent true
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+        stage("Deploy DB"){
+            when {
+                environment name: 'BUILD_DB', value: 'on'
+                beforeAgent true
+            }
+            steps{
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+        stage("Deploy Infrastructure"){
+            parallel{
+                stage("Deploying Infrastructure"){
+                    when {
+                        environment name: 'BUILD_INFR', value: 'on'
+                        beforeAgent true
+                    }
+                    steps{
+                        sh "hostname"
+                        sh "echo $version"
+                        sh "echo $BUILD_FRONTEND"
+                        sh "echo $BUILD_BACKEND"
+                        sh "echo $BUILD_ADMIN"
+                        sh "echo $BUILD_INFR"
+                        sh "echo $BUILD_DB"
+                    }
+                }
+                stage("Run DB Container"){
+                    when {
+                        environment name: 'BUILD_DB', value: 'on'
+                        beforeAgent true
+                    }
+                    steps{
+                        sh "hostname"
+                        sh "echo $version"
+                        sh "echo $BUILD_FRONTEND"
+                        sh "echo $BUILD_BACKEND"
+                        sh "echo $BUILD_ADMIN"
+                        sh "echo $BUILD_INFR"
+                        sh "echo $BUILD_DB"
+                    }
+                }
+            }
+        }
+    }
+}
