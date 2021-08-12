@@ -1,0 +1,82 @@
+pipeline {
+    agent any
+    parameters {
+        string(name: 'environment', defaultValue: 'DEV', description: 'Parameter for specifying the environment.') 
+        string(name: 'custom_version', defaultValue: 'none', description: 'Leave this as none to follow the default version naming or put the custom version')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_FRONTEND')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_BACKEND')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_ADMIN')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_INFR')
+        choice(
+                choices: ['on', 'off'],
+                description: '',
+                name: 'BUILD_DB')
+    }          
+    
+    stages{
+
+        stage('Assign variables') {
+            steps {
+                script {
+                    if (custom_version != 'none') {
+                        env.version = "${custom_version}"
+                    }
+                    else {
+                        env.version = "${env.BUILD_NUMBER}"
+                    }
+                }
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+
+        stage("Condition"){
+            agent {
+                label "srv1"
+            }
+            steps{
+
+                sh "echo do something before condition"
+
+                script {
+                    if (environment == 'DEV' || environment == 'AQA') {
+                       sh "echo Environment is ${environment} "
+                    }
+                    else {
+                        sh "echo Environment is not DEV or AQA"
+                    }
+
+                }
+
+
+                sh "hostname"
+                sh "echo $version"
+                sh "echo $BUILD_FRONTEND"
+                sh "echo $BUILD_BACKEND"
+                sh "echo $BUILD_ADMIN"
+                sh "echo $BUILD_INFR"
+                sh "echo $BUILD_DB"
+            }
+        }
+
+            
+        
+    }
+}
