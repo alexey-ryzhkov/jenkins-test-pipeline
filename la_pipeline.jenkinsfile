@@ -1,0 +1,23 @@
+pipeline{
+    agent any
+    environment {
+        gccHome = "/usr/bin/gcc"
+    }
+    stages{
+        stage("Gettig git repo data"){
+            steps{
+                git poll: false, url: 'https://github.com/linuxacademy/content-pipelines-cje-labs.git'
+            }
+        }
+        stage("Building App"){
+            steps {
+                sh "'${gccHome}' --std=c99 -o mario lab1_lab2/mario.c"
+            }
+        }
+        stage("Archiving artifacts"){
+            steps {
+                archiveArtifacts artifacts: 'mario', followSymlinks: false
+            }
+        }
+    }
+}
